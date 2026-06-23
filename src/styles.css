@@ -1,0 +1,186 @@
+@import "tailwindcss";
+
+/* Self-hosted fonts (no CDN, font-display: swap baked in by Fontsource) */
+@import "@fontsource-variable/space-grotesk/index.css";
+@import "@fontsource/dm-sans/latin-400.css";
+@import "@fontsource/dm-sans/latin-500.css";
+@import "@fontsource/dm-sans/latin-700.css";
+
+@theme {
+  --font-display: "Space Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+
+  /* Single locked accent: electric cyan. Used identically across the whole page. */
+  --color-accent: #22d3ee;
+  --color-accent-bright: #67e8f9;
+  --color-accent-deep: #0e7490;
+
+  /* Off-black base (never pure #000) */
+  --color-night-950: #08080b;
+  --color-night-900: #0d0d12;
+  --color-night-850: #121219;
+  --color-night-800: #181820;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    background-color: var(--color-night-950);
+    color-scheme: dark;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100%;
+    background-color: var(--color-night-950);
+    color: var(--color-zinc-100);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-accent) 35%, transparent);
+    color: #fff;
+  }
+
+  /* Dark, slim scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-night-950);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-night-800);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #2a2a33;
+  }
+}
+
+@layer utilities {
+  /* Cyan text glow for hero accent words */
+  .text-glow {
+    text-shadow:
+      0 0 24px color-mix(in oklab, var(--color-accent) 55%, transparent),
+      0 0 60px color-mix(in oklab, var(--color-accent) 30%, transparent);
+  }
+
+  /* Soft cyan box glow for CTAs / focus rings */
+  .shadow-glow {
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--color-accent) 40%, transparent),
+      0 10px 40px -8px color-mix(in oklab, var(--color-accent) 45%, transparent);
+  }
+
+  /* Fade a long image into the page bg at the bottom */
+  .mask-fade-b {
+    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+  }
+
+  .mask-fade-r {
+    -webkit-mask-image: linear-gradient(to right, #000 70%, transparent 100%);
+    mask-image: linear-gradient(to right, #000 70%, transparent 100%);
+  }
+
+  /* Hide scrollbar on horizontal rails while keeping scroll */
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Edge-fade mask for the marquee */
+  .marquee-mask {
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent,
+      #000 7%,
+      #000 93%,
+      transparent
+    );
+    mask-image: linear-gradient(
+      90deg,
+      transparent,
+      #000 7%,
+      #000 93%,
+      transparent
+    );
+  }
+
+  .animate-marquee {
+    animation: yoru-marquee 48s linear infinite;
+  }
+  .marquee-pause:hover .animate-marquee {
+    animation-play-state: paused;
+  }
+
+  /* Frosted glass for overlay surfaces (palette, modals). Solid fallback for
+     prefers-reduced-transparency. */
+  .glass-panel {
+    background: color-mix(in oklab, var(--color-night-900) 82%, transparent);
+    backdrop-filter: blur(24px) saturate(150%);
+    -webkit-backdrop-filter: blur(24px) saturate(150%);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.08),
+      0 24px 80px -12px rgb(0 0 0 / 0.7);
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .glass-panel {
+      background: var(--color-night-900);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+  }
+}
+
+@keyframes yoru-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Lenis smooth-scroll required styles */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+/* Elements that animate in via GSAP start hidden, but stay visible if JS never runs */
+.reveal-init {
+  opacity: 0;
+  transform: translateY(28px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-init {
+    opacity: 1;
+    transform: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
