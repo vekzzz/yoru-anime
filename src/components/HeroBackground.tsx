@@ -79,9 +79,10 @@ export function HeroBackground() {
       const ro = new ResizeObserver(resize);
       ro.observe(canvas);
 
-      const clock = new THREE.Clock();
+      const timer = new THREE.Timer();
       const render = () => {
-        const t = clock.getElapsedTime();
+        timer.update();
+        const t = timer.getElapsed();
         points.rotation.y = t * 0.04;
         points.rotation.x = Math.sin(t * 0.12) * 0.05;
         // Subtle parallax toward the cursor (no React state, no re-render).
@@ -100,6 +101,7 @@ export function HeroBackground() {
         geometry.dispose();
         material.dispose();
         renderer.dispose();
+        timer.dispose();
       };
     });
 

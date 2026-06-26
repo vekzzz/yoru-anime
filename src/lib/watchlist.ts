@@ -36,12 +36,15 @@ function emit() {
 }
 
 function subscribe(cb: () => void) {
-  // First subscriber triggers the storage load (post-hydration).
-  if (!loaded) {
-    load();
-    if (ids.length) queueMicrotask(emit);
-  }
   listeners.add(cb);
+  // Defer load to a microtask so React 19's hydration snapshot check always
+  // sees the empty server snapshot first, preventing attribute mismatches.
+  if (!loaded) {
+    queueMicrotask(() => {
+      load();
+      if (ids.length) emit();
+    });
+  }
   // Keep multiple tabs in sync.
   const onStorage = (e: StorageEvent) => {
     if (e.key === KEY) {

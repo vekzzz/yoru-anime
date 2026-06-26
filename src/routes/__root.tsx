@@ -1,6 +1,7 @@
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
+import { lazy, Suspense } from 'react'
 
 import appCss from '../styles.css?url'
 import { SmoothScroll } from '../components/SmoothScroll'
@@ -8,6 +9,10 @@ import { Grain } from '../components/Grain'
 import { CommandPalette } from '../components/CommandPalette'
 import { TrailerModal } from '../components/TrailerModal'
 import { PageTransition } from '../components/PageTransition'
+
+const AgentDock = lazy(() =>
+  import('../components/agent/AgentDock').then((m) => ({ default: m.AgentDock }))
+)
 
 export const Route = createRootRoute({
   head: () => ({
@@ -45,6 +50,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <SmoothScroll><PageTransition>{children}</PageTransition></SmoothScroll>
         <CommandPalette />
         <TrailerModal />
+        <Suspense fallback={null}><AgentDock /></Suspense>
         <TanStackDevtools
           config={{ position: 'bottom-right' }}
           plugins={[

@@ -14,6 +14,7 @@ import { Route as BrowseRouteImport } from './routes/browse'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WatchIdRouteImport } from './routes/watch.$id'
 import { Route as WatchIdEpRouteImport } from './routes/watch.$id_.$ep'
+import { Route as ApiAgentChatRouteImport } from './routes/api.agent.chat'
 
 const WatchlistRoute = WatchlistRouteImport.update({
   id: '/watchlist',
@@ -40,12 +41,18 @@ const WatchIdEpRoute = WatchIdEpRouteImport.update({
   path: '/watch/$id/$ep',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAgentChatRoute = ApiAgentChatRouteImport.update({
+  id: '/api/agent/chat',
+  path: '/api/agent/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/browse': typeof BrowseRoute
   '/watchlist': typeof WatchlistRoute
   '/watch/$id': typeof WatchIdRoute
+  '/api/agent/chat': typeof ApiAgentChatRoute
   '/watch/$id/$ep': typeof WatchIdEpRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   '/browse': typeof BrowseRoute
   '/watchlist': typeof WatchlistRoute
   '/watch/$id': typeof WatchIdRoute
+  '/api/agent/chat': typeof ApiAgentChatRoute
   '/watch/$id/$ep': typeof WatchIdEpRoute
 }
 export interface FileRoutesById {
@@ -61,19 +69,33 @@ export interface FileRoutesById {
   '/browse': typeof BrowseRoute
   '/watchlist': typeof WatchlistRoute
   '/watch/$id': typeof WatchIdRoute
+  '/api/agent/chat': typeof ApiAgentChatRoute
   '/watch/$id_/$ep': typeof WatchIdEpRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/browse' | '/watchlist' | '/watch/$id' | '/watch/$id/$ep'
+  fullPaths:
+    | '/'
+    | '/browse'
+    | '/watchlist'
+    | '/watch/$id'
+    | '/api/agent/chat'
+    | '/watch/$id/$ep'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/browse' | '/watchlist' | '/watch/$id' | '/watch/$id/$ep'
+  to:
+    | '/'
+    | '/browse'
+    | '/watchlist'
+    | '/watch/$id'
+    | '/api/agent/chat'
+    | '/watch/$id/$ep'
   id:
     | '__root__'
     | '/'
     | '/browse'
     | '/watchlist'
     | '/watch/$id'
+    | '/api/agent/chat'
     | '/watch/$id_/$ep'
   fileRoutesById: FileRoutesById
 }
@@ -82,6 +104,7 @@ export interface RootRouteChildren {
   BrowseRoute: typeof BrowseRoute
   WatchlistRoute: typeof WatchlistRoute
   WatchIdRoute: typeof WatchIdRoute
+  ApiAgentChatRoute: typeof ApiAgentChatRoute
   WatchIdEpRoute: typeof WatchIdEpRoute
 }
 
@@ -122,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WatchIdEpRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/agent/chat': {
+      id: '/api/agent/chat'
+      path: '/api/agent/chat'
+      fullPath: '/api/agent/chat'
+      preLoaderRoute: typeof ApiAgentChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -130,6 +160,7 @@ const rootRouteChildren: RootRouteChildren = {
   BrowseRoute: BrowseRoute,
   WatchlistRoute: WatchlistRoute,
   WatchIdRoute: WatchIdRoute,
+  ApiAgentChatRoute: ApiAgentChatRoute,
   WatchIdEpRoute: WatchIdEpRoute,
 }
 export const routeTree = rootRouteImport

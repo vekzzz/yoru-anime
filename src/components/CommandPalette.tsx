@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+﻿import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Search, CornerDownLeft } from "lucide-react";
+import { Search, CornerDownLeft, Sparkles } from "lucide-react";
 import { catalog, trending } from "../lib/site-data";
 import { setPalette, togglePalette, usePalette } from "../lib/overlays";
+import { openAgent } from "../lib/agent/store";
 
 // Cmd/Ctrl-K command palette. Frosted-glass panel, fully keyboard driven
 // (arrows to move, Enter to open, Esc to close). Always mounted so it can
@@ -63,6 +64,11 @@ export function CommandPalette() {
     navigate({ to: "/watch/$id", params: { id } });
   };
 
+  const askAgent = (query?: string) => {
+    setPalette(false);
+    openAgent((query ?? q.trim()) || undefined);
+  };
+
   // Swipe the bottom sheet down to dismiss (mobile).
   const onHandleStart = (e: React.TouchEvent) => {
     dragStart.current = e.touches[0].clientY;
@@ -86,11 +92,15 @@ export function CommandPalette() {
       setActive((i) => Math.min(i + 1, results.length - 1));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setActive((i) => Math.max(i - 1, 0));
+      setActive((i) => Math.max(i - 1, -1));
     } else if (e.key === "Enter") {
       e.preventDefault();
-      const r = results[active];
-      if (r) go(r.id);
+      if (active === -1) {
+        askAgent();
+      } else {
+        const r = results[active];
+        if (r) go(r.id);
+      }
     }
   };
 
@@ -148,9 +158,36 @@ export function CommandPalette() {
         </div>
 
         <ul className="max-h-[52vh] overflow-y-auto p-2">
+          {/* Ask YORU agent entry — always shown, but highlighted when query has no catalog match */}
+          <li>
+            <button
+              type="button"
+              onMouseEnter={() => setActive(-1)}
+              onClick={() => askAgent()}
+              className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition active:scale-[0.98] ${
+                active === -1 ? "bg-accent/15" : "hover:bg-white/5"
+              }`}
+            >
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-accent/15">
+                <Sparkles strokeWidth={1.5} className="h-4 w-4 text-accent" />
+              </div>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate font-display text-sm font-semibold text-white">
+                  {q.trim() ? `Ask: "${q.trim()}"` : "Ask YORU Assistant"}
+                </span>
+                <span className="block text-xs text-zinc-500">
+                  Recommendations, info, and app control
+                </span>
+              </span>
+              {active === -1 && (
+                <CornerDownLeft strokeWidth={1.5} className="h-4 w-4 shrink-0 text-accent" />
+              )}
+            </button>
+          </li>
+
           {results.length === 0 ? (
-            <li className="px-4 py-10 text-center text-sm text-zinc-500">
-              No titles match “{q}”.
+            <li className="px-4 py-6 text-center text-sm text-zinc-500">
+              No titles match "{q}" — try asking the assistant above.
             </li>
           ) : (
             results.map((s, i) => (

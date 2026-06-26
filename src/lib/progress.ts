@@ -39,11 +39,13 @@ function emit() {
 }
 
 function subscribe(cb: () => void) {
-  if (!loaded) {
-    load();
-    if (entries.length) queueMicrotask(emit);
-  }
   listeners.add(cb);
+  if (!loaded) {
+    queueMicrotask(() => {
+      load();
+      if (entries.length) emit();
+    });
+  }
   const onStorage = (e: StorageEvent) => {
     if (e.key === KEY) {
       try {

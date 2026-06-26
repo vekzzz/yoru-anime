@@ -11,9 +11,10 @@ const config = defineConfig({
   resolve: { tsconfigPaths: true },
   plugins: [
     devtools(),
-    nitro({ rollupConfig: { external: [/^@sentry\//] } }),
     tailwindcss(),
+    // Order matters: tanstackStart() must come before nitro(), and react() last.
     tanstackStart(),
+    nitro({ rollupConfig: { external: [/^@sentry\//] } }),
     viteReact(),
   ],
 })
