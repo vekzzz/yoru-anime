@@ -79,9 +79,17 @@ export const Route = createFileRoute("/api/agent/chat")({
             } catch (err) {
               const msg = err instanceof Error ? err.message : "Unknown error";
               console.error("[agent] loop error:", msg);
+              const isGroqRateLimit =
+                msg.includes("429") &&
+                (msg.toLowerCase().includes("rate") || msg.toLowerCase().includes("tpm"));
               controller.enqueue(
                 encoder.encode(
-                  encodeSSE({ type: "error", message: "Something went wrong." }),
+                  encodeSSE({
+                    type: "error",
+                    message: isGroqRateLimit
+                      ? "Groq rate limit reached (tokens per minute). Wait a few seconds and try again."
+                      : "Something went wrong.",
+                  }),
                 ),
               );
             } finally {
